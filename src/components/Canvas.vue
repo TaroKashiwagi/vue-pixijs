@@ -32,7 +32,7 @@ export default {
 
     const filter = new PIXI.Filter(null, shaderFrag);
     filter.uniforms.iResolution = [width, height, 1.0];
-    filter.uniforms.iTime = 1.0;
+    filter.uniforms.iTime = 0.0;
     container.filters = [filter];
 
     app.ticker.add(function() {
