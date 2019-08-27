@@ -1,5 +1,4 @@
 <template lang="pug">
-  .div
 </template>
 
 <script>
@@ -11,14 +10,36 @@ export default {
     }
   },
   mounted() {
-    this.app = new PIXI.Application({
-      transparent: true,
-      antialias: true
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const app = new PIXI.Application(width, height);
+    document.body.appendChild(app.view);
+
+    const shaderFrag = `
+      precision mediump float;
+      uniform float iTime;
+      uniform vec2 iResolution;
+    
+      void main() {
+        vec2 uv = gl_FragCoord.xy / iResolution.xy;
+        gl_FragColor = vec4(uv, 0.5 + 0.5 * sin(iTime), 1.0);
+      }
+    `;
+
+    const container = new PIXI.Container();
+    container.filterArea = app.screen;
+    app.stage.addChild(container);
+
+    const filter = new PIXI.Filter(null, shaderFrag);
+    filter.uniforms.iResolution = [width, height, 1.0];
+    filter.uniforms.iTime = 1.0;
+    container.filters = [filter];
+
+    app.ticker.add(function() {
+      filter.uniforms.iTime += app.ticker.elapsedMS * 0.001;
     });
-    this.$el.appendChild(this.app.view);
-    this.app.renderer.view.style.display = "block";
-    this.app.renderer.autoResize = true;
-    this.app.renderer.resize(window.innerWidth, window.innerHeight);
+
+    
   },
   methods: {
   }
